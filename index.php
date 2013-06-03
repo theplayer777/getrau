@@ -1,4 +1,5 @@
 <?php
+//hello world
     global $getrau;
     $getrau = Application::getInstance();
     function __autoload($class){
