@@ -1,0 +1,13 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr" lang="fr">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <base href="views/" />
+  <link rel="stylesheet" href="style.css" />
+  {% block head%}{% endblock %}
+  <title>{% block title %}{% endblock %} - Getrau</title>
+</head>
+<body>
+    {% include 'menu.html.twig' %}
+    {% block content %}{% endblock %}
+</body>
+</html>
