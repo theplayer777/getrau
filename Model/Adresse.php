@@ -1,196 +1,72 @@
 <?php
 
+class Model_Adresse {
 
-class Model_Adresse
-{
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="idadresse", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="SEQUENCE")
-     * @ORM\SequenceGenerator(sequenceName="adresse_idadresse_seq", allocationSize=1, initialValue=1)
-     */
-    private $idadresse;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="rue", type="string", length=200, nullable=true)
-     */
+    private $idAdresse;
     private $rue;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="numero", type="string", length=10, nullable=true)
-     */
     private $numero;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="codepostal", type="integer", nullable=true)
-     */
-    private $codepostal;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="localite", type="string", length=45, nullable=true)
-     */
+    private $codePostal;
     private $localite;
-    
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="emplacement", type="integer", length=128, nullable=true)
-     */
+    private $emplacement;
 
-    private $ideleve;
-
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        //$this->ideleve = new \Doctrine\Common\Collections\ArrayCollection();
+    public function __construct() {
+        
     }
 
-
-    /**
-     * Get idadresse
-     *
-     * @return integer 
-     */
-    public function getIdadresse()
-    {
-        return $this->idadresse;
+    public function setIdAdresse($idAdresse) {
+        $this->idAdresse = $idAdresse;
     }
 
-    /**
-     * Set rue
-     *
-     * @param string $rue
-     * @return Adresse
-     */
-    public function setRue($rue)
-    {
+    public function getIdAdresse() {
+        return $this->idAdresse;
+    }
+
+    public function setRue($rue) {
         $this->rue = $rue;
 
         return $this;
     }
 
-    /**
-     * Get rue
-     *
-     * @return string 
-     */
-    public function getRue()
-    {
+    public function getRue() {
         return $this->rue;
     }
 
-    /**
-     * Set numero
-     *
-     * @param string $numero
-     * @return Adresse
-     */
-    public function setNumero($numero)
-    {
+    public function setNumero($numero) {
         $this->numero = $numero;
 
         return $this;
     }
 
-    /**
-     * Get numero
-     *
-     * @return string 
-     */
-    public function getNumero()
-    {
+    public function getNumero() {
         return $this->numero;
     }
 
-    /**
-     * Set codepostal
-     *
-     * @param integer $codepostal
-     * @return Adresse
-     */
-    public function setCodepostal($codepostal)
-    {
-        $this->codepostal = $codepostal;
+    public function setCodepostal($codepostal) {
+        $this->codePostal = $codepostal;
 
         return $this;
     }
 
-    /**
-     * Get codepostal
-     *
-     * @return integer 
-     */
-    public function getCodepostal()
-    {
-        return $this->codepostal;
+    public function getCodepostal() {
+        return $this->codePostal;
     }
 
-    /**
-     * Set localite
-     *
-     * @param string $localite
-     * @return Adresse
-     */
-    public function setLocalite($localite)
-    {
+    public function setLocalite($localite) {
         $this->localite = $localite;
 
         return $this;
     }
 
-    /**
-     * Get localite
-     *
-     * @return string 
-     */
-    public function getLocalite()
-    {
+    public function getLocalite() {
         return $this->localite;
     }
-
-    /**
-     * Add ideleve
-     *
-     * @param \Jne\GetrauBundle\Entity\Eleve $ideleve
-     * @return Adresse
-     */
-    public function addIdeleve(\Jne\GetrauBundle\Entity\Eleve $ideleve)
-    {
-        $this->ideleve[] = $ideleve;
-
-        return $this;
+    
+    public function setEmplacement($emplacement){
+        $this->emplacement = $emplacement;
     }
-
-    /**
-     * Remove ideleve
-     *
-     * @param \Jne\GetrauBundle\Entity\Eleve $ideleve
-     */
-    public function removeIdeleve(\Jne\GetrauBundle\Entity\Eleve $ideleve)
-    {
-        $this->ideleve->removeElement($ideleve);
-    }
-
-    /**
-     * Get ideleve
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getIdeleve()
-    {
-        return $this->ideleve;
+    
+    public function getEmplacement(){
+        return $this->emplacement;
     }
 
 }

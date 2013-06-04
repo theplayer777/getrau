@@ -350,7 +350,7 @@ class Statistiques
      * @param \Jne\GetrauBundle\Entity\Eleve $ideleve
      * @return Statistiques
      */
-    public function setIdeleve(\Jne\GetrauBundle\Entity\Eleve $ideleve = null)
+    public function setIdEleve(\Jne\GetrauBundle\Entity\Eleve $ideleve = null)
     {
         $this->ideleve = $ideleve;
 
@@ -362,7 +362,7 @@ class Statistiques
      *
      * @return \Jne\GetrauBundle\Entity\Eleve 
      */
-    public function getIdeleve()
+    public function getIdEleve()
     {
         return $this->ideleve;
     }

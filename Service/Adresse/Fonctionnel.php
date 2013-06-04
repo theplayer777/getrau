@@ -8,13 +8,17 @@ class Service_Adresse_Fonctionnel {
     }
     
     function persist($adresse){
-        if (!$adresse->id){
-            $serviceCrud = new Service_Adresse_Crud();
+        $serviceCrud = new Service_Adresse_Crud();
+        if (!$adresse->idAdresse){
             return $serviceCrud->insert($adresse);
         }else{
-            $serviceCrud = new Service_Adresse_Crud();
             return $serviceCrud->modify($adresse);     
         }
+    }
+    
+    function getByParams($params){
+        $serviceCrud = new Service_Adresse_Crud();
+        return $serviceCrud->getByParams($params);
     }
     
 }

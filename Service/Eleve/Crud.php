@@ -24,9 +24,9 @@ class Service_Eleve_Crud {
         
         // LA LIGNE SUIVANTE NE DOIT ETRE POSSIBLE QU'ICI!!!
         $eleve->setIdEleve($object->ideleve);
-        $eleve->setDatenaissance($object->datenaissance);
+        $eleve->setDateNaissance($object->datenaissance);
         $eleve->setNom($object->nom);
-        $eleve->setNumeroscolaire($object->numeroscolaire);
+        $eleve->setNumeroScolaire($object->numeroscolaire);
         $eleve->setPrenom($object->prenom);
         $eleve->setSexe($object->sexe);
         $eleve->setStatuscourant($object->statuscourant);
@@ -36,33 +36,49 @@ class Service_Eleve_Crud {
     }
     
     public function insert($eleve){
-        $sql = "INSERT INTO eleve (numeroscolaire,nom,prenom,datenaissance,sexe,statuscourant,statussuivant) VALUES
-            ('".$eleve->getNumeroscolaire()."',
-            '".$eleve->getNom()."',
-            '".$eleve->getPrenom()."',
-            '".$eleve->getDatenaissance()."',
-            '".$eleve->getSexe()."',
-            '".$eleve->getStatuscourant()."',
-            '".$eleve->getStatussuivant()."'
-                )";
-        $this->db->query($sql);
-        
-        echo $sql;
+        $params="numeroscolaire";
+        $values="";
+        if(isset($eleve->getNom())){
+            $params.=",nom";
+            $values.=",'".$eleve->getNumeroScolaire()."'";
+        }
+        if(isset($eleve->getPrenom())){
+            $params.=",prenom";
+            $values.=",'".$eleve->getPrenom()."'";
+        }
+        if(isset($eleve->getDateNaissance())){
+            $params.=",datenaissance";
+            $values.=",'".$eleve->getDateNaissance()."'";
+        }
+        if(isset($eleve->getSexe())){
+            $params.=",sexe";
+            $values.=",'".$eleve->getSexe()."'";
+        }
+        if(isset($eleve->getStatusCourant())){
+            $params.=",statuscourant";
+            $values.=",'".$eleve->getStatusCourant()."'";
+        }
+        if(isset($eleve->getStatusSuivant())){
+            $params.=",statussuivant";
+            $values.=",'".$eleve->getStatusSuivant()."'";
+        }
+        $query = "INSERT INTO eleve (".$params.") VALUES (".$values.") RETURNING ideleve";
+
+        return $this->db->query($query);
     }
     
     public function modify($eleve){
         $sql = "UPDATE eleve SET
-            numeroscolaire = '".$eleve->getNumeroscolaire()."',
+            numeroscolaire = '".$eleve->getNumeroScolaire()."',
             nom = '".$eleve->getNom()."',
             prenom = '".$eleve->getPrenom()."',
-            datenaissance = '".$eleve->getDatenaissance()."',
+            datenaissance = '".$eleve->getDateNaissance()."',
             sexe = '".$eleve->getSexe()."',
             statuscourant = '".$eleve->getStatuscourant()."',
             statussuivant = '".$eleve->getStatussuivant()."'
-                WHERE ideleve = ".$eleve->getIdeleve();
+                WHERE ideleve = ".$eleve->getIdEleve()."RETURNING ideleve";
         
-        $this->db->query($sql);
-        echo $sql;
+        return $this->db->query($sql);
     }
     
     private function buildEleve(){

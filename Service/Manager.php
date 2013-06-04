@@ -41,5 +41,11 @@ class Service_Manager {
         $serviceFonctionnel = new $serviceName();
         return $serviceFonctionnel->getGeoJSON();
     }
+    
+    function getByParams($class,$params){
+        $serviceName = self::$PREFIX.$class."_Fonctionnel";
+        $serviceFonctionnel = new $serviceName();
+        return $serviceFonctionnel->getByParams($params);
+    }
 }
 ?>

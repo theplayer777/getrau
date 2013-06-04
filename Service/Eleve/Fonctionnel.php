@@ -8,11 +8,10 @@ class Service_Eleve_Fonctionnel {
     }
     
     function persist($eleve){
-        if (!$eleve->getIdeleve()){
-            $serviceCrud = new Service_Eleve_Crud();
+        $serviceCrud = new Service_Eleve_Crud();
+        if (!$eleve->getIdEleve()){
             return $serviceCrud->insert($eleve);
         }else{
-            $serviceCrud = new Service_Eleve_Crud();
             return $serviceCrud->modify($eleve);     
         }
     }

@@ -4,7 +4,7 @@
 class Model_Eleve
 {
     
-    private $ideleve;
+    private $idEleve;
 
     
     private $numeroscolaire;
@@ -16,39 +16,39 @@ class Model_Eleve
     private $prenom;
 
     
-    private $datenaissance;
+    private $dateNaissance;
 
     
     private $sexe;
 
     
-    private $statuscourant;
+    private $statusCourant;
 
     
-    private $statussuivant;
+    private $statusSuivant;
 
     
-    private $idadresse;
+    private $adresses;
 
    
-    private $idclasse;
+    private $classes;
 
     
     public function __construct()
     {
     }
 
-    public function setIdeleve($ideleve){
-        $this->ideleve = $ideleve;
+    public function setIdEleve($ideleve){
+        $this->idEleve = $ideleve;
     }
     
-    public function getIdeleve()
+    public function getIdEleve()
     {
-        return $this->ideleve;
+        return $this->idEleve;
     }
 
 
-    public function setNumeroscolaire($numeroscolaire)
+    public function setNumeroScolaire($numeroscolaire)
     {
         $this->numeroscolaire = $numeroscolaire;
 
@@ -56,7 +56,7 @@ class Model_Eleve
     }
 
     
-    public function getNumeroscolaire()
+    public function getNumeroScolaire()
     {
         return $this->numeroscolaire;
     }
@@ -90,17 +90,17 @@ class Model_Eleve
     }
 
     
-    public function setDatenaissance($datenaissance)
+    public function setDateNaissance($datenaissance)
     {
-        $this->datenaissance = $datenaissance;
+        $this->dateNaissance = $datenaissance;
 
         return $this;
     }
 
     
-    public function getDatenaissance()
+    public function getDateNaissance()
     {
-        return $this->datenaissance;
+        return $this->dateNaissance;
     }
 
     
@@ -118,70 +118,56 @@ class Model_Eleve
     }
 
     
-    public function setStatuscourant($statuscourant)
+    public function setStatusCourant($statuscourant)
     {
-        $this->statuscourant = $statuscourant;
+        $this->statusCourant = $statuscourant;
 
         return $this;
     }
 
    
-    public function getStatuscourant()
+    public function getStatusCourant()
     {
-        return $this->statuscourant;
+        return $this->statusCourant;
     }
 
     
-    public function setStatussuivant($statussuivant)
-    {
-        $this->statussuivant = $statussuivant;
+    public function setStatusSuivant($statussuivant){
+        $this->statusSuivant = $statussuivant;
 
         return $this;
     }
 
     
-    public function getStatussuivant()
-    {
-        return $this->statussuivant;
+    public function getStatusSuivant(){
+        return $this->statusSuivant;
     }
 
     
-    public function addIdadresse($idadresse)
-    {
-        $this->idadresse[] = $idadresse;
+    public function addAdresse($adresse){
+        $this->adresses[] = $adresse;
+
+        return $this;
+    }
+    
+    public function getAdresses(){
+        return $this->adresses;
+    }
+
+    
+    public function removeAdresse($adresse){
+        
+    }
+
+    
+    public function addClasse($classe){
+        $this->classes[] = $classe;
 
         return $this;
     }
 
     
-    public function removeIdadresse($idadresse)
-    {
-        $this->idadresse->removeElement($idadresse);
-    }
-
-    
-    public function getIdadresse()
-    {
-        return $this->idadresse;
-    }
-
-    
-    public function addIdclasse($idclasse)
-    {
-        $this->idclasse[] = $idclasse;
-
-        return $this;
-    }
-
-    
-    public function removeIdclasse($idclasse)
-    {
+    public function removeClasse($idclasse){
         $this->idclasse->removeElement($idclasse);
-    }
-
-    
-    public function getIdclasse()
-    {
-        return $this->idclasse;
     }
 }
