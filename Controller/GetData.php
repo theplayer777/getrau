@@ -16,6 +16,11 @@ class Controller_GetData {
         print_r($servicesManager->getGeoJSON('Arret'));
     }
     
+    public function getLignesGeoJSON(){
+        $servicesManager = new Service_Manager();
+        print_r($servicesManager->getGeoJSON('Ligne'));
+    }
+    
 }
 
 ?>

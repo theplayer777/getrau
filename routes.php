@@ -16,6 +16,14 @@ $array = [
         "controller" => "GetData",
         "action" => "getArretsGeoJSON",
     ],
+    "/getLignes" => [
+        "controller" => "GetData",
+        "action" => "getLignesGeoJSON",
+    ],
+    "/importEleves" => [
+        "controller" => "SetData",
+        "action" => "importEleves",
+    ],
     "/modifyEleve" => [
         "controller" => "SetData",
         "action" => "modifyEleve",

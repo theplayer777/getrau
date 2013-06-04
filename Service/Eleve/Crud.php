@@ -3,9 +3,9 @@
 class Service_Eleve_Crud {
     
     private $db;
-        
-    function __construct(){
-        $this->db = new PDO('pgsql:host=localhost;port=5432;dbname=getrau;user=postgres;password=postgres');
+    
+    function __construct() {
+        $this->db = Application::getInstance()->db;
     }
     
     public function getAll(){

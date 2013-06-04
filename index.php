@@ -3,7 +3,7 @@
     global $getrau;
     $getrau = Application::getInstance();
     function __autoload($class){
-        if(strpos($class,'Twig') === false){
+        if(strpos($class,'Twig') === false && strpos($class,'PHPExcel') === false){
             $path = str_replace('_', DIRECTORY_SEPARATOR, $class);
             
         }else{

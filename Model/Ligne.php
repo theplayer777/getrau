@@ -1,162 +1,82 @@
 <?php
 
-namespace Jne\GetrauBundle\Entity;
-
-use Doctrine\ORM\Mapping as ORM;
-
-/**
- * Ligne
- *
- * @ORM\Table(name="ligne")
- * @ORM\Entity
- */
-class Ligne
+class Model_Ligne
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="idligne", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="SEQUENCE")
-     * @ORM\SequenceGenerator(sequenceName="ligne_idligne_seq", allocationSize=1, initialValue=1)
-     */
-    private $idligne;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="region", type="string", length=255, nullable=true)
-     */
+    private $idLigne;
+
     private $region;
 
-    /**
-     * @var \Doctrine\Common\Collections\Collection
-     *
-     * @ORM\ManyToMany(targetEntity="Course", mappedBy="idligne")
-     */
     private $numero;
+    
+    private $couleur;
 
-    /**
-     * @var \Doctrine\Common\Collections\Collection
-     *
-     * @ORM\ManyToMany(targetEntity="Routebus", inversedBy="idligne")
-     * @ORM\JoinTable(name="ligne_routebus",
-     *   joinColumns={
-     *     @ORM\JoinColumn(name="idligne", referencedColumnName="idligne")
-     *   },
-     *   inverseJoinColumns={
-     *     @ORM\JoinColumn(name="idroutebus", referencedColumnName="idroutebus")
-     *   }
-     * )
-     */
-    private $idroutebus;
+    private $routesBus;
+    
+    private $idArrets;
 
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->numero = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->idroutebus = new \Doctrine\Common\Collections\ArrayCollection();
+    public function __construct(){
+
     }
 
 
-    /**
-     * Get idligne
-     *
-     * @return integer 
-     */
-    public function getIdligne()
-    {
-        return $this->idligne;
+    public function getIdLigne(){
+        return $this->idLigne;
     }
 
-    /**
-     * Set region
-     *
-     * @param string $region
-     * @return Ligne
-     */
-    public function setRegion($region)
-    {
+    public function setRegion($region){
         $this->region = $region;
-
         return $this;
     }
 
-    /**
-     * Get region
-     *
-     * @return string 
-     */
-    public function getRegion()
-    {
+    public function getRegion(){
         return $this->region;
     }
 
-    /**
-     * Add numero
-     *
-     * @param \Jne\GetrauBundle\Entity\Course $numero
-     * @return Ligne
-     */
-    public function addNumero(\Jne\GetrauBundle\Entity\Course $numero)
-    {
+    public function setNumero($numero){
         $this->numero[] = $numero;
 
         return $this;
     }
 
-    /**
-     * Remove numero
-     *
-     * @param \Jne\GetrauBundle\Entity\Course $numero
-     */
-    public function removeNumero(\Jne\GetrauBundle\Entity\Course $numero)
-    {
+    public function removeNumero($numero){
         $this->numero->removeElement($numero);
     }
 
-    /**
-     * Get numero
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getNumero()
-    {
+    public function getNumero(){
         return $this->numero;
     }
 
-    /**
-     * Add idroutebus
-     *
-     * @param \Jne\GetrauBundle\Entity\Routebus $idroutebus
-     * @return Ligne
-     */
-    public function addIdroutebus(\Jne\GetrauBundle\Entity\Routebus $idroutebus)
-    {
-        $this->idroutebus[] = $idroutebus;
+    public function addRouteBus($routeBus){
+        $this->routesBus[] = $routeBus;
 
         return $this;
     }
 
-    /**
-     * Remove idroutebus
-     *
-     * @param \Jne\GetrauBundle\Entity\Routebus $idroutebus
-     */
-    public function removeIdroutebus(\Jne\GetrauBundle\Entity\Routebus $idroutebus)
-    {
-        $this->idroutebus->removeElement($idroutebus);
+    public function removeRouteBus($routeBus){
+        unset($this->routesBus->$routeBus);
     }
 
-    /**
-     * Get idroutebus
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getIdroutebus()
+    public function getRoutesbus()
     {
-        return $this->idroutebus;
+        return $this->routesBus;
     }
+    
+    public function getIdArrets() {
+        return $this->idArrets;
+    }
+
+    public function addIdArret($idArret) {
+        $this->idArrets[] = $idArret;
+    }
+
+    public function getCouleur() {
+        return $this->couleur;
+    }
+
+    public function setCouleur($couleur) {
+        $this->couleur = $couleur;
+    }
+
+
 }

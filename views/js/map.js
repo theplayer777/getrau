@@ -2,9 +2,8 @@ var arrets, refresh, filter_arrets_nom;
 $(document).ready(function() {
 
     map = new OpenLayers.Map('map');
-    
-    OpenLayers.ProxyHost = "proxy.php?url=";
 
+    //Creation de la carte de fond SwissTopo
     var carte = new OpenLayers.Layer.WMTS({
         name: "Swisstopo PK",
         url: ["http://wmts0.geo.admin.ch/", "http://wmts1.geo.admin.ch/", "http://wmts.geo.admin.ch/"],
@@ -22,82 +21,139 @@ $(document).ready(function() {
         params: {'time': 20130213}
     });
 
-    var styleMap = new OpenLayers.Style({
+
+    //Creation des différents styles pour les layers
+    var styleArrets = new OpenLayers.Style({
         pointRadius: 10,
         fillColor: "#ff0000"
     });
-    refresh = new OpenLayers.Strategy.Refresh({force: true, active: true});
 
-    filter_arrets_nom = new OpenLayers.Filter.Comparison({
+    var styleLignes = new OpenLayers.Style({
+        strokeWidth: 5,
+        strokeColor: "#00ff00"
+    });
+
+    //Stratégies pour rafraichir automatiquement les layers lors du changement du filtre
+    refreshArrets = new OpenLayers.Strategy.Refresh({force: true, active: true});
+    refreshLignes = new OpenLayers.Strategy.Refresh({force: true, active: true});
+
+    //Filtre de comparaison. Le filtre est le même pour tous les layers
+    filter = new OpenLayers.Filter.Comparison({
         type: OpenLayers.Filter.Comparison.LIKE,
-        property: "name",
+        property: "tags",
         value: ""
     });
 
-    filter_arrets_id = new OpenLayers.Filter.Comparison({
-        type: OpenLayers.Filter.Comparison.LIKE,
-        property: "localite",
-        value: ""
+    //la règle associée au filtre
+    rule_filter = new OpenLayers.Rule({
+        filter: filter
     });
 
-    var c_filter = new OpenLayers.Filter.Logical({
-        type: OpenLayers.Filter.Logical.OR,
-    });
+    //Ajout de la règle aux différents style des layers
+    styleArrets.addRules([rule_filter]);
+    styleLignes.addRules([rule_filter]);
 
-    c_filter.filters.push(filter_arrets_nom);
-    c_filter.filters.push(filter_arrets_id);
 
-    rule_arrets = new OpenLayers.Rule({
-        filter: c_filter
-    });
-
-    styleMap.addRules([rule_arrets]);
-
+    //Création du layer des arrêts de bus
     arrets = new OpenLayers.Layer.Vector("Arrêts de bus", {
-     styleMap: styleMap,
-     strategies: [new OpenLayers.Strategy.Fixed(), refresh],
-     protocol: new OpenLayers.Protocol.HTTP({
-     url: "../getArrets",
-     params: {
-     'filter': $("#filter").val()
-     },
-     format: new OpenLayers.Format.GeoJSON()
-     }),
-     projection: new OpenLayers.Projection("EPSG:4326")
-     });
-
-    /*var wms = new OpenLayers.Layer.WMS(
-            "Arrets de bus",
-            "http://localhost:8880/geoserver/cite/wms",
-            {
-                layers: 'cite:arretstransport_input', // la liste des couches à assembler dans une image cartographique
-                format: 'image/png',
-                transparent: 'true',
-                filter: filter_arrets_nom
-            }, {
-        displayOutsideMaxExtent: true,
-    });*/
-
-    /*capitals = new OpenLayers.Layer.Vector("Arrets de bus", {
-        protocol: new OpenLayers.Protocol.WFS({
-            url: "http://localhost:8880/geoserver/cite/wf",
-            featureType: "arretstransport_input",
-            featurePrefix: "cite",
-            featureNS: "http://jira.codehaus.org/secure/BrowseProject.jspa?id=10311",
-            defaultFilter: c_filter
+        styleMap: styleArrets,
+        strategies: [new OpenLayers.Strategy.Fixed(), refreshArrets],
+        protocol: new OpenLayers.Protocol.HTTP({
+            url: "../getArrets",
+            params: {
+                'filter': $("#filter").val()
+            },
+            format: new OpenLayers.Format.GeoJSON()
         }),
-        strategies: [new OpenLayers.Strategy.BBOX()]
-    });*/
+        projection: new OpenLayers.Projection("EPSG:4326")
+    });
 
-    map.addLayers([carte, arrets]);
+    //Création du layer des lignes de bus
+    lignes = new OpenLayers.Layer.Vector("Lignes de bus", {
+        styleMap: styleLignes,
+        strategies: [new OpenLayers.Strategy.Fixed(), refreshLignes],
+        protocol: new OpenLayers.Protocol.HTTP({
+            url: "../getLignes",
+            params: {
+                'filter': $("#filter").val()
+            },
+            format: new OpenLayers.Format.GeoJSON()
+        }),
+        projection: new OpenLayers.Projection("EPSG:4326")
+    });
+
+    //Ajout des layers sur la carte
+    map.addLayers([carte, arrets, lignes]);
+
+    //Ajout du layerSwitcher
     map.addControl(new OpenLayers.Control.LayerSwitcher());
+
+    //Recentrage de la map sur Aubonne
     map.setCenter(new OpenLayers.LonLat(520000, 148000), 8);
 
+    //Fonction permettant la mise à jour du filtre
     $("#filter").keyup(function() {
-        //arrets.protocol.params.filter = $("#filter").val();
-        filter_arrets_nom.value = $("#filter").val();
-        filter_arrets_id.value = $("#filter").val();
-        refresh.refresh();
+        filter.value = $("#filter").val();
+        filter.value = $("#filter").val();
+        refreshArrets.refresh();
+        refreshLignes.refresh();
     });
 
+    // activation du contrôle de sélection "hover" sur la couche arrets
+    selectControl = new OpenLayers.Control.SelectFeature([arrets,lignes], {click: true});
+    map.addControl(selectControl);
+    selectControl.activate();
+
+    arrets.events.register("featureselected", arrets, onArretSelect);
+    arrets.events.register("featureunselected", arrets, onFeatureUnselect);
+    lignes.events.register("featureselected", arrets, onLigneSelect);
+    lignes.events.register("featureunselected", arrets, onFeatureUnselect);
+
+
 });
+
+function onPopupClose(evt) {
+    selectControl.unselect(this.feature);
+}
+
+function onArretSelect(evt) {
+    feature = evt.feature;
+    popup = new OpenLayers.Popup.FramedCloud("featurePopup",
+            feature.geometry.getBounds().getCenterLonLat(),
+            new OpenLayers.Size(100, 100),
+            "<h2>" + feature.attributes.name + "</h2>" +
+            "<b>Localité:</b> " +
+            feature.attributes.localite,
+            null,
+            true,
+            onPopupClose
+            );
+    feature.popup = popup;
+    popup.feature = feature;
+    map.addPopup(popup);
+}
+
+function onLigneSelect(evt) {
+    feature = evt.feature;
+    popup = new OpenLayers.Popup.FramedCloud("featurePopup",
+            feature.geometry.getBounds().getCenterLonLat(),
+            new OpenLayers.Size(100, 100),
+            "<h2>" + feature.attributes.region + "</h2>",
+            null,
+            true,
+            onPopupClose
+            );
+    feature.popup = popup;
+    popup.feature = feature;
+    map.addPopup(popup);
+}
+
+function onFeatureUnselect(evt) {
+    feature = evt.feature;
+    if (feature.popup) {
+        popup.feature = null;
+        map.removePopup(feature.popup);
+        feature.popup.destroy();
+        feature.popup = null;
+    }
+}
