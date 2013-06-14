@@ -1,7 +1,7 @@
 <?php
 
 
-class Model_Eleve
+class Model_Eleve implements JsonSerializable
 {
     
     private $idEleve;
@@ -153,7 +153,16 @@ class Model_Eleve
     public function getAdresses(){
         return $this->adresses;
     }
-
+    public function getClasses(){
+        return $this->classes;
+    }
+    public function setAdresses($adresses){
+        $this->adresses = $adresses;
+    }
+    
+    public function setClasses($classes){
+        $this->classes = $classes;
+    }
     
     public function removeAdresse($adresse){
         
@@ -169,5 +178,10 @@ class Model_Eleve
     
     public function removeClasse($idclasse){
         $this->idclasse->removeElement($idclasse);
+    }
+
+    public function jsonSerialize() {
+        $eleve = array('nom' => $this->nom, 'prenom' => $this->prenom, 'adresses' => array($this->adresses), 'classes' => array($this->classes));
+        return $eleve;
     }
 }

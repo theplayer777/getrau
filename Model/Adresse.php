@@ -1,6 +1,6 @@
 <?php
-
-class Model_Adresse {
+header('Content-Type: text/html; charset=utf-8');
+class Model_Adresse implements JsonSerializable {
 
     private $idAdresse;
     private $rue;
@@ -41,13 +41,13 @@ class Model_Adresse {
         return $this->numero;
     }
 
-    public function setCodepostal($codepostal) {
+    public function setCodePostal($codepostal) {
         $this->codePostal = $codepostal;
 
         return $this;
     }
 
-    public function getCodepostal() {
+    public function getCodePostal() {
         return $this->codePostal;
     }
 
@@ -67,6 +67,11 @@ class Model_Adresse {
     
     public function getEmplacement(){
         return $this->emplacement;
+    }
+
+    public function jsonSerialize() {
+        $adresse = array('rue' => $this->rue, "numero" => $this->numero, "localite" => $this->localite );
+        return $adresse;
     }
 
 }

@@ -4,29 +4,33 @@ $array = [
         "controller" => "View",
         "action" => "test",
     ],
-    "/getEleve" => [
-        "controller" => "View",
-        "action" => "getEleve",
-    ],
     "/map" => [
         "controller" => "View",
         "action" => "getMap",
     ],
-    "/getArrets" => [
+    "/getArretsGeoJSON" => [
         "controller" => "GetData",
         "action" => "getArretsGeoJSON",
     ],
-    "/getLignes" => [
+    "/getLignesGeoJSON" => [
         "controller" => "GetData",
         "action" => "getLignesGeoJSON",
     ],
-    "/importEleves" => [
-        "controller" => "SetData",
-        "action" => "importEleves",
+    "/getEleves" => [
+        "controller" => "View",
+        "action" => "getEleves",
     ],
-    "/modifyEleve" => [
-        "controller" => "SetData",
-        "action" => "modifyEleve",
+    "/api/getEleves" => [
+        "controller" => "GetData",
+        "action" => "getEleves",
+    ],
+    "/getElevesGeoJSON" => [
+        "controller" => "GetData",
+        "action" => "getElevesGeoJSON",
+    ],
+    "/import" => [
+        "controller" => "View",
+        "action" => "import",
     ],
 ];
 ?>

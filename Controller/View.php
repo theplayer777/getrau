@@ -15,18 +15,22 @@ class Controller_View {
         echo "hello world";
     }
     
-    public function getMap() {
+    public function getMap($filter=null) {
         $servicesManager = new Service_Manager();
         //$reponse = $servicesManager->getById('Adresse', 4);
-        echo $this->twig->render('map.html.twig');
+        echo $this->twig->render('map.html.twig',array('filter' =>$filter));
     }
     
-    public function getEleve(){
-        
-        
-        $serviceManager = new Service_Manager();
-        $eleve = $serviceManager->getById('Eleve', 2);
-        echo $this->twig->render('index.html.twig',array('eleve' => $eleve));
+    
+    public function getEleves(){
+        $controllerGetData = new Controller_GetData();
+        $eleves = $controllerGetData->getEleves(1);
+        echo $this->twig->render('eleves.html.twig',array('eleves' => $eleves));
+
+    }
+    
+    public function import(){
+        echo $this->twig->render('import.html.twig');
     }
     
 }

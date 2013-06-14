@@ -1,0 +1,31 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Index{% endblock %}
+{% block head %}
+{% endblock %}
+{% block content %}
+<script>
+
+function supportMultiple() {
+    var el = document.createElement("input");
+    return ("multiple" in el);
+}
+
+function init() {
+    if(supportMultiple()) {
+        document.querySelector("#multipleFileLabel").setAttribute("style","");
+    }
+}
+
+</script>
+
+</head>
+
+<body onload="init()">
+
+    <form action="/getrau/" method="post" enctype="multipart/form-data">
+        Normal Text: <input type="text" name="name">
+        <span id="multipleFileLabel" style="display:none">Multiple </span>File: <input type="file" name="files" multiple="multiple">
+        <input type="submit">
+    </form>
+{% endblock %}

@@ -1,4 +1,5 @@
 <?php
+header('Content-Type: text/html; charset=utf-8');
 //hello world
     global $getrau;
     $getrau = Application::getInstance();
@@ -17,14 +18,14 @@
     $pathWithParams = substr($_SERVER['REQUEST_URI'],7);
             $pathTab = explode("?",$pathWithParams);
             $path=$pathTab[0];
-            //echo $path;
             $params=array();
             if(!empty($pathTab[1])){
-                $urlParams=explode("&",$pathTab[1]);
+                $pathTabEncoded = urldecode($pathTab[1]);
+                $urlParams=explode("&",$pathTabEncoded);
                 foreach ($urlParams as $urlParam){
                     $param = array();
                     $param2 = explode("=",$urlParam);
-                    $params[$param2[0]] = $param2[1];
+                    $params[$param2[0]] = utf8_encode($param2[1]);
                 }
                 //print_r($params);
             }

@@ -1,6 +1,6 @@
 <?php
 
-class Classe {
+class Model_Classe implements JsonSerializable {
 
     private $idClasse;
     private $nom;
@@ -73,6 +73,10 @@ class Classe {
 
     public function getNumeroEtablissement() {
         return $this->numeroEtablissement;
+    }
+
+    public function jsonSerialize() {
+        return $this->nom;
     }
 
 }

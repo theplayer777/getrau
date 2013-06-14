@@ -32,10 +32,16 @@ $(document).ready(function() {
         strokeWidth: 5,
         strokeColor: "#00ff00"
     });
+    
+    var styleEleves = new OpenLayers.Style({
+        pointRadius: 10,
+        fillColor: "#0000ff"
+    });
 
     //Stratégies pour rafraichir automatiquement les layers lors du changement du filtre
     refreshArrets = new OpenLayers.Strategy.Refresh({force: true, active: true});
     refreshLignes = new OpenLayers.Strategy.Refresh({force: true, active: true});
+    refreshEleves = new OpenLayers.Strategy.Refresh({force: true, active: true});
 
     //Filtre de comparaison. Le filtre est le même pour tous les layers
     filter = new OpenLayers.Filter.Comparison({
@@ -52,6 +58,7 @@ $(document).ready(function() {
     //Ajout de la règle aux différents style des layers
     styleArrets.addRules([rule_filter]);
     styleLignes.addRules([rule_filter]);
+    styleEleves.addRules([rule_filter]);
 
 
     //Création du layer des arrêts de bus
@@ -59,7 +66,7 @@ $(document).ready(function() {
         styleMap: styleArrets,
         strategies: [new OpenLayers.Strategy.Fixed(), refreshArrets],
         protocol: new OpenLayers.Protocol.HTTP({
-            url: "../getArrets",
+            url: "../getArretsGeoJSON",
             params: {
                 'filter': $("#filter").val()
             },
@@ -73,7 +80,21 @@ $(document).ready(function() {
         styleMap: styleLignes,
         strategies: [new OpenLayers.Strategy.Fixed(), refreshLignes],
         protocol: new OpenLayers.Protocol.HTTP({
-            url: "../getLignes",
+            url: "../getLignesGeoJSON",
+            params: {
+                'filter': $("#filter").val()
+            },
+            format: new OpenLayers.Format.GeoJSON()
+        }),
+        projection: new OpenLayers.Projection("EPSG:4326")
+    });
+    
+    //Création du layer des élèves
+    eleves = new OpenLayers.Layer.Vector("Elèves", {
+        styleMap: styleEleves,
+        strategies: [new OpenLayers.Strategy.Fixed(), refreshEleves],
+        protocol: new OpenLayers.Protocol.HTTP({
+            url: "../getElevesGeoJSON",
             params: {
                 'filter': $("#filter").val()
             },
@@ -83,7 +104,7 @@ $(document).ready(function() {
     });
 
     //Ajout des layers sur la carte
-    map.addLayers([carte, arrets, lignes]);
+    map.addLayers([carte, arrets, lignes, eleves]);
 
     //Ajout du layerSwitcher
     map.addControl(new OpenLayers.Control.LayerSwitcher());
@@ -97,17 +118,20 @@ $(document).ready(function() {
         filter.value = $("#filter").val();
         refreshArrets.refresh();
         refreshLignes.refresh();
+        refreshEleves.refresh();
     });
 
     // activation du contrôle de sélection "hover" sur la couche arrets
-    selectControl = new OpenLayers.Control.SelectFeature([arrets,lignes], {click: true});
+    selectControl = new OpenLayers.Control.SelectFeature([arrets,lignes,eleves], {click: true});
     map.addControl(selectControl);
     selectControl.activate();
 
     arrets.events.register("featureselected", arrets, onArretSelect);
     arrets.events.register("featureunselected", arrets, onFeatureUnselect);
-    lignes.events.register("featureselected", arrets, onLigneSelect);
-    lignes.events.register("featureunselected", arrets, onFeatureUnselect);
+    lignes.events.register("featureselected", lignes, onLigneSelect);
+    lignes.events.register("featureunselected", lignes, onFeatureUnselect);
+    eleves.events.register("featureselected", eleves, onEleveSelect);
+    eleves.events.register("featureunselected", eleves, onFeatureUnselect);
 
 
 });
@@ -148,6 +172,21 @@ function onLigneSelect(evt) {
     map.addPopup(popup);
 }
 
+function onEleveSelect(evt) {
+    feature = evt.feature;
+    popup = new OpenLayers.Popup.FramedCloud("featurePopup",
+            feature.geometry.getBounds().getCenterLonLat(),
+            new OpenLayers.Size(100, 100),
+            "<h2>"+ feature.attributes.prenom + " " + feature.attributes.name + " " + feature.attributes.tags + "</h2>",
+            null,
+            true,
+            onPopupClose
+            );
+    feature.popup = popup;
+    popup.feature = feature;
+    map.addPopup(popup);
+}
+
 function onFeatureUnselect(evt) {
     feature = evt.feature;
     if (feature.popup) {
@@ -157,3 +196,11 @@ function onFeatureUnselect(evt) {
         feature.popup = null;
     }
 }
+
+$(window).load(function () {
+        filter.value = $("#filter").val();
+        filter.value = $("#filter").val();
+        refreshArrets.refresh();
+        refreshLignes.refresh();
+        refreshEleves.refresh();
+});

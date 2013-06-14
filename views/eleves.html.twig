@@ -1,0 +1,58 @@
+{% extends "base.html.twig" %}
+
+{% block head %}
+<style type="text/css" title="currentStyle">
+        @import "js/datatables/css/demo_page.css";
+        @import "js/datatables/css/demo_table.css";
+    </style>
+    <script type="text/javascript" src="js/jquery/jquery-1.9.1.js"></script>
+    <script type="text/javascript" language="javascript" src="js/datatables/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" charset="utf-8">
+                            $(document).ready(function() {
+                                    $('#example').dataTable( {
+                                            "sPaginationType": "full_numbers",
+                                            "iDisplayLength": 50
+                                    } );
+                            } );
+        </script>
+{% endblock %}
+{% block title %}Map{% endblock %}
+{% block submenu %}
+<div id="submenu">
+<a href="../import">Importer</a>
+</div>
+{% endblock %}
+{% block content %}
+
+        <table cellpadding="0" cellspacing="0" border="0" class="display" id="example">
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Prénom</th>
+                    <th>Date de naissance</th>
+                    <th>Genre</th>
+                    <th>Adresse</th>
+                    <th>Numero</th>
+                    <th>Localite</th>
+                    <th>Classe</th>
+                    <th>Afficher</th>
+                </tr>
+            </thead>
+            <tbody>
+{% for eleve in eleves %}
+                    <tr>
+                        <td>{{ eleve.nom }}</td>
+                        <td>{{ eleve.prenom }}</td>
+                        <td>{{ eleve.dateNaissance }}</td>
+                        <td>{{ eleve.sexe }}</td>
+                        <td>{{ eleve.adresses[0].rue }}</td>
+                        <td>{{ eleve.adresses[0].numero }}</td>
+                        <td>{{ eleve.adresses[0].localite }}</td>
+                        <td>{{ eleve.classes[0].nom }}</td>
+                        <td><a href="/getrau/map?filter={{ eleve.prenom }} {{ eleve.nom }}">Afficher</a></td>
+                    </tr>
+{% endfor %}
+                </tbody>
+                </table>
+
+{% endblock %}

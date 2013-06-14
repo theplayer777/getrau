@@ -36,6 +36,12 @@ class Service_Manager {
         
     }
     
+    function deleteAll($class){
+        $serviceName = self::$PREFIX.$class."_Fonctionnel";
+        $serviceFonctionnel = new $serviceName();
+        return $serviceFonctionnel->deleteAll();
+    }
+    
     function getGeoJSON($class){
         $serviceName = self::$PREFIX.$class."_Fonctionnel";
         $serviceFonctionnel = new $serviceName();

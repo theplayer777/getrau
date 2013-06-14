@@ -51,7 +51,7 @@ class Controller_SetData {
             $colNames['cycle'] = "CLDivisionCycleVoieCourant";
             $colNames['professeur'] = "MaîtreClasseCourant";
         } else {
-            $colNames['classeSuivante'] = "ClasseSuivante";
+            $colNames['classe'] = "ClasseSuivante";
             $colNames['etablissement'] = "LieuEnsSuivant";
             $colNames['cycle'] = "CLDivisionCycleVoieSuivant";
             $colNames['professeur'] = "MaîtreClasseSuivant";
@@ -62,11 +62,19 @@ class Controller_SetData {
         $colNames['localite'] = "LocalitéDomicileRésultat";
         $colNames['sexe'] = "Sexe";
         $colNames['dateNaissance'] = "DateNaissance";
-        $colRows = Array();
 
-        if (file_exists("data/sample.xlsx")) {
-            $objPHPExcel = PHPExcel_IOFactory::load("data/sample.xlsx");
-            //print_r($objPHPExcel->getActiveSheet()->getCellCollection());
+        $files = array_slice(array_filter(glob('data/*'), 'is_file'), 0);
+        print_r($files);
+        $serviceManager = new Service_Manager();
+
+
+        //--------------------- PREMIERE ETAPE ----------------------//
+        //On parcourt une première fois chaque fichier afin de créer les objects élève,
+        //et ce même si certains élèves ne se trouve que dans un fichier
+        $assocArray = Array();
+        foreach ($files as $file) {
+            $colRows = Array();
+            $objPHPExcel = PHPExcel_IOFactory::load($file);
             $highestRow = $objPHPExcel->getActiveSheet()->getHighestRow();
             $highestCol = PHPExcel_Cell::columnIndexFromString($objPHPExcel->getActiveSheet()->getHighestColumn());
             $y = 0;
@@ -79,65 +87,241 @@ class Controller_SetData {
                     }
                 }
             }
-            $eleves = Array();
+
+            $assocArray = $this->createAssocArray($colRows, $objPHPExcel, $assocArray);
+
             for ($i = 2; $i <= $highestRow; $i++) {
+
+                //On test si l'élève n'a pas déjà été créé lors d'un parcours precedent de la boucle
+                //echo empty($assocArray[$colRows['idEleve']]);
+                /* if (empty($assocArray[$colRows['idEleve']])) {
+
+                  //Si il n'as pas encore été ajouté, on le créé avec les données principales
+                  $eleve = new Model_Eleve();
+                  if (!empty($colRows['idEleve']) && !empty($colRows['nomEleve']) && !empty($colRows['prenomEleve'])) {
+                  $eleve->setNumeroScolaire($objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['idEleve'], $i)->getValue());
+                  $eleve->setNom($objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['nomEleve'], $i)->getValue());
+                  $eleve->setPrenom($objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['prenomEleve'], $i)->getValue());
+                  array_push($eleves, $eleve);
+                  }
+                  } */
+            }
+        }
+
+        echo "<pre>";
+        print_r($assocArray);
+        echo "</pre>";
+
+        //------------------------ DEUXIEME ETAPE ------------------------------//
+        //Nous avons maintenant tous les élèves avec leurs données principales: id,nom et prenom
+        //Depuis ici, on parcourt tous les fichiers une nouvelles fois pour remplir les informations restantes
+        //on defini les variables pour savoir quels éléments ont déjà étés ajoutés
+        $sexeIsRegistered = false;
+        $dateNaissanceIsRegistered = false;
+        $adresseIsRegistered = false;
+        $classeIsRegistered = false;
+
+        /* foreach ($files as $file) {
+          $objPHPExcel = PHPExcel_IOFactory::load($file);
+          //print_r($objPHPExcel);
+          //on repère quelles sont les nom des colonnes qui nous intéressent, en fonction de leurs noms
+          $y = 0;
+          for ($i = 1; $i <= $highestCol; $i++) {
+          $names[$i] = $objPHPExcel->getActiveSheet()->getCellByColumnAndRow($i, 1)->getValue();
+          foreach ($colNames as $col => $key) {
+          if ($names[$i] == $key) {
+          $colRows[$col] = $i;
+          $y++;
+          }
+          }
+          }
+
+          //Pour que cela fonctionne même si l'ordre des fichiers n'est pas le même, on créé un tableau associatif avec l'id de chaque élève
+          $assocArray = $this->createAssocArray($colRows, $objPHPExcel);
+
+          if (!empty($colRows['sexeEleve']) && !$sexeIsRegistered) {
+          foreach ($eleves as $eleve) {
+          if (!empty($assocArray[$eleve->getIdEleve()]['sexe'])) {
+          $eleve->setSexe($assocArray[$eleve->getIdEleve()]['sexe']);
+          }
+          }
+          $sexeIsRegistered = true;
+          }
+          if (!empty($colRows['dateNaissance']) && !$dateNaissanceIsRegisteredIsRegistered) {
+          foreach ($eleves as $eleve) {
+          if (!empty($assocArray[$eleve->getIdEleve()]['dateNaissance'])) {
+          $eleve->setDateNaissance($assocArray[$eleve->getIdEleve()]['dateNaissance']);
+          }
+          }
+          $dateNaissanceIsRegistered = true;
+          }
+
+          //Données liées
+          //Adresse
+          if (!empty($colRows['rue']) && !empty($colRows['npa']) && !empty($colRows['localite']) && !$adresseIsRegistered) {
+
+          foreach ($eleves as $eleve) {
+          //on set les paramètres de l'adresse en fonction du fichier Excel, puis on recherche dans la db si cette adresse existe déjà
+          $adresses = $serviceManager->getByParams('Adresse', array("rue" => $assocArray[$eleve->getIdEleve()]['rue'], $assocArray[$eleve->getIdEleve()]['numero'], "codepostal" => $assocArray[$eleve->getIdEleve()]['npa'], "localite" => $assocArray[$eleve->getIdEleve()]['localite']));
+          //Si l'adresse n'existe pad dans la bd, on l'enregistre
+          if (empty($adresses)) {
+          $adresse = new Model_Adresse();
+          $adresse->setRue($assocArray[$eleve->getIdEleve()]['rue']);
+          if (!empty($assocArray[$eleve->getIdEleve()]['numero'])) {
+          $adresse->setNumero($assocArray[$eleve->getIdEleve()]['numero']);
+          }
+          $adresse->setCodePostal($assocArray[$eleve->getIdEleve()]['npa']);
+          $adresse->setLocalite($assocArray[$eleve->getIdEleve()]['localite']);
+          $idAdresse = $serviceManager->persist($adresse);
+          $adresses = $serviceManager->getById('Adresse', $idAdresse);
+          //echo "NOUVELLE ADRESSE:";
+          //print_r($adresses);
+          }
+
+          $eleve->setAdresses($adresses);
+          }
+          $adresseIsRegistered = true;
+          }
+
+          //Classe
+          if (!empty($colRows['classe']) && !empty($colRows['etablissement']) && !$classeIsRegistered) {
+          foreach ($eleves as $eleve) {
+          //on set les paramètres de la classe en fonction du fichier Excel, puis on recherche dans la db si cette classe existe déjà
+          $classes = $serviceManager->getByParams('Classe', array("nom" => $assocArray[$eleve->getIdEleve()]['classe'], "numeroetablissement" => $assocArray[$eleve->getIdEleve()]['etablissement']));
+
+          //Si la classe n'existe pas dans la bd, on l'enregistre
+          if (empty($classes)) {
+          $classe = new Model_Classe();
+          $classe->setNom($assocArray[$eleve->getIdEleve()]['classe']);
+          $classe->setNumeroEtablissement($assocArray[$eleve->getIdEleve()]['etablissement']);
+          if (!empty($assocArray[$eleve->getIdEleve()]['cycle'])) {
+          $classe->setCycle($assocArray[$eleve->getIdEleve()]['cycle']);
+          }
+          if (!empty($assocArray[$eleve->getIdEleve()]['professeur'])) {
+          $classe->setProfesseur($assocArray[$eleve->getIdEleve()]['numero']);
+          }
+          $idClasse = $serviceManager->persist($classe);
+          $classes = $serviceManager->getById('Classe', $idClasse);
+          }
+          $eleve->setClasses($classes);
+          }
+          $classeIsRegistered = true;
+          }
+          } */
+
+        //avant d'insérer les nouvelles données, on efface les anciennes
+        $serviceManager->deleteAll('Eleve');
+        foreach ($assocArray as $numeroEleve => $tabEleve) {
+            //avant tout, on test si l'élève a une classe (dans le cas de l'enclassement courant)
+            //car sinon, il ne doit pas être enregistré en tant qu'élève
+            if (!empty($tabEleve['classe'])) {
                 $eleve = new Model_Eleve();
 
-                //Données de base
-                if (!empty($colRows['idEleve'])) {
-                    $eleve->setNom($objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['idEleve'], $i)->getValue());
+                // LA LIGNE SUIVANTE NE DOIT ETRE POSSIBLE QU'ICI!!!
+                $eleve->setDateNaissance($tabEleve['dateNaissance']);
+                $eleve->setNom($tabEleve['nomEleve']);
+                $eleve->setNumeroScolaire($numeroEleve);
+                $eleve->setPrenom($tabEleve['prenomEleve']);
+                $eleve->setSexe($tabEleve['sexe']);
+                //$eleve->setStatuscourant($tabEleve['nomEleve']);
+                //$eleve->setStatussuivant($tabEleve['nomEleve']);
+                $paramsAdresse = array("rue" => $tabEleve['rue'], "codepostal" => $tabEleve['npa'], "localite" => $tabEleve['localite']);
+                if (!empty($tabEleve['numero'])) {
+                    $paramsAdresse['numero'] = $tabEleve['numero'];
+                } else {
+                    $paramsAdresse['numero'] = null;
                 }
-                if (!empty($colRows['nomEleve'])) {
-                    $eleve->setNom($objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['nomEleve'], $i)->getValue());
-                }
-                if (!empty($colRows['prenomEleve'])) {
-                    $eleve->setPrenom($objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['prenomEleve'], $i)->getValue());
-                }
-                if (!empty($colRows['sexeEleve'])) {
-                    $eleve->setSexe($objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['sexeEleve'], $i)->getValue());
-                }
-                if (!empty($colRows['dateNaissance'])) {
-                    $eleve->setSexe($objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['dateNaissance'], $i)->getValue());
-                }
+                $adresses = $serviceManager->getByParams('Adresse', $paramsAdresse);
 
-                //Données liées
-                //Adresse
-                if (!empty($colRows['rue']) && !empty($colRows['npa']) && !empty($colRows['localite'])) {
-                    $serviceManager = new Service_Manager();
-                    $adresse = $serviceManager->getByParams('Adresse', array("rue" => $objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['rue'], $i)->getValue(), "numero" => $objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['numero'], $i)->getValue(), "codepostal" => $objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['npa'], $i)->getValue(), "localite" => $objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['localite'], $i)->getValue()));
-                    //print_r($adresse);
-                    $eleve->addAdresse($adresse);
-                }
-
-                //Classe
-                if (!empty($colRows['classe']) && !empty($colRows['etablissement'])) {
-                    $serviceManager = new Service_Manager();
-                    $classe = $serviceManager->getByParams('Classe', array("nom" => $objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['classe'], $i)->getValue(), "numeroEtablissement" => $objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['etablissement'], $i)->getValue()));
-                    if (!empty($classe)) {
-                        $classe = new Model_Classe();
-                        $classe->setNom($objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['classe'], $i)->getValue());
-                        $classe->setNumeroEtablissement($objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['etablissement'], $i)->getValue());
-                        if (!empty($colRows['cycle'])) {
-                            $classe->setCycle($objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['cycle'], $i)->getValue());
-                        }
-                        if (!empty($colRows['professeur'])) {
-                            $classe->setProfesseur($objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['professeur'], $i)->getValue());
-                        }
-                        $idClasse = $serviceManager->persist($classe);
-                        $classe = $serviceManager->getById('Classe', $idClasse);
+                //Si l'adresse n'existe pas, on l'ajoute dans la BD
+                if (empty($adresses)) {
+                    $adresse = new Model_Adresse();
+                    $adresse->setRue($tabEleve['rue']);
+                    if (!empty($tabEleve['numero'])) {
+                        $adresse->setNumero($tabEleve['numero']);
+                    } else {
+                        $adresse->setNumero(null);
                     }
-                    $eleve->addClasse($classe);
-                }
-                
-                $serviceManager->persist($eleve);
+                    $adresse->setCodePostal($tabEleve['npa']);
+                    $adresse->setLocalite($tabEleve['localite']);
+                    $idAdresse = $serviceManager->persist($adresse);
+                    $adresses = array($serviceManager->getById('Adresse', $idAdresse));
 
-                //array_push($eleves, $eleve);
+                    /* return $eleve;
+                      echo $numeroEleve;
+                      echo $tabEleve['nomEleve']; */
+                }
+                $eleve->setAdresses($adresses);
+
+                $paramsClasse = array("nom" => $tabEleve['classe'], "numeroetablissement" => $tabEleve['etablissement']);
+                if (!empty($tabEleve['cycle'])) {
+                    $paramsClasse['cycle'] = $tabEleve['cycle'];
+                }
+                $classes = $serviceManager->getByParams('Classe', $paramsClasse);
+                //Si la classe n'existe pas dans la bd, on l'enregistre
+                if (empty($classes)) {
+                    $classe = new Model_Classe();
+                    $classe->setNom($tabEleve['classe']);
+                    $classe->setNumeroEtablissement($tabEleve['etablissement']);
+                    if (!empty($tabEleve['cycle'])) {
+                        $classe->setCycle($tabEleve['cycle']);
+                    }
+                    if (!empty($tabEleve['professeur'])) {
+                        $classe->setProfesseur($tabEleve['professeur']);
+                    }
+                    $idClasse = $serviceManager->persist($classe);
+                    $classes = array($serviceManager->getById('Classe', $idClasse));
+                }
+                $eleve->setClasses($classes);
+
+                $serviceManager->persist($eleve);
             }
-            //print_r($eleves);
-            //$eleve->persist;
-        } else {
-            echo "fichier introuvable";
         }
+    }
+
+    private function createAssocArray($colRows, $objPHPExcel, $valueTables) {
+        $highestRow = $objPHPExcel->getActiveSheet()->getHighestRow();
+        $highestCol = PHPExcel_Cell::columnIndexFromString($objPHPExcel->getActiveSheet()->getHighestColumn());
+        $i = 2;
+        echo "highestRow: " . $highestRow;
+        for ($i = 2; $i <= $highestRow; $i++) {
+            if (empty($valueTables[$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['idEleve'], $i)->getValue()]['nomEleve'])) {
+                $valueTables[$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['idEleve'], $i)->getValue()]['nomEleve'] = $objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['nomEleve'], $i)->getValue();
+                //echo "valueTables[" . $objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['idEleve'], $i)->getValue() . "]['nomEleve']=" . $objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['nomEleve'], $i)->getValue() . "<br/>";
+            }
+            $valueTables[$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['idEleve'], $i)->getValue()]['prenomEleve'] = $objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['prenomEleve'], $i)->getValue();
+            if (!empty($colRows['dateNaissance'])) {
+                $valueTables[$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['idEleve'], $i)->getValue()]['dateNaissance'] = PHPExcel_Style_NumberFormat::toFormattedString($objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['dateNaissance'], $i)->getValue(), "M-D-YYYY");
+            }
+            if (!empty($colRows['sexe'])) {
+                $valueTables[$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['idEleve'], $i)->getValue()]['sexe'] = $objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['sexe'], $i)->getValue();
+            }
+            if (!empty($colRows['rue'])) {
+                $valueTables[$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['idEleve'], $i)->getValue()]['rue'] = $objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['rue'], $i)->getValue();
+            }
+            if (!empty($colRows['numero'])) {
+                $valueTables[$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['idEleve'], $i)->getValue()]['numero'] = $objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['numero'], $i)->getValue();
+            }
+            if (!empty($colRows['npa'])) {
+                $valueTables[$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['idEleve'], $i)->getValue()]['npa'] = $objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['npa'], $i)->getValue();
+            }
+            if (!empty($colRows['localite'])) {
+                $valueTables[$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['idEleve'], $i)->getValue()]['localite'] = $objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['localite'], $i)->getValue();
+            }
+            if (!empty($colRows['classe'])) {
+                $valueTables[$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['idEleve'], $i)->getValue()]['classe'] = $objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['classe'], $i)->getValue();
+            }
+            if (!empty($colRows['etablissement'])) {
+                $valueTables[$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['idEleve'], $i)->getValue()]['etablissement'] = $objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['etablissement'], $i)->getValue();
+            }
+            if (!empty($colRows['cycle'])) {
+                $valueTables[$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['idEleve'], $i)->getValue()]['cycle'] = $objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['cycle'], $i)->getValue();
+            }
+            if (!empty($colRows['professeur'])) {
+                $valueTables[$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['idEleve'], $i)->getValue()]['professeur'] = $objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['professeur'], $i)->getValue();
+            }
+        }
+        return $valueTables;
     }
 
 }

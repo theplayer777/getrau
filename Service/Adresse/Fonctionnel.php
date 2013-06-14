@@ -9,7 +9,7 @@ class Service_Adresse_Fonctionnel {
     
     function persist($adresse){
         $serviceCrud = new Service_Adresse_Crud();
-        if (!$adresse->idAdresse){
+        if (!$adresse->getIdAdresse()){
             return $serviceCrud->insert($adresse);
         }else{
             return $serviceCrud->modify($adresse);     

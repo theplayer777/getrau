@@ -9,7 +9,7 @@ class Service_Classe_Fonctionnel {
     
     function persist($classe){
         $serviceCrud = new Service_Classe_Crud();
-        if (!$classe->idClasse){
+        if (!$classe->getIdClasse()){
             return $serviceCrud->insert($classe);
         }else{
             return $serviceCrud->modify($classe);     

@@ -1,58 +1,116 @@
 <?php
 
 class Service_Adresse_Crud {
-        
+
     private $db;
-    
+
     function __construct() {
         $this->db = Application::getInstance()->db;
     }
-    
-    function getById($id){
-        
-        $getrau = Application::getInstance();
-        $sql = "SELECT * FROM adresse WHERE idadresse = ".$id;
-        $result = $getrau->db->query($sql);
-        $object = $result->fetch(PDO::FETCH_OBJ);
-        print_r ($object);
-        
+
+    public function getById($id) {
+
+        $query = "SELECT * FROM adresse WHERE idadresse = " . $id;
+        $result = $this->db->query($query);
+        if (!empty($result)) {
+            $object = $result->fetch(PDO::FETCH_OBJ);
+            $adresse = $this->buildAdresse($object);
+            return $adresse;
+        } else {
+            return null;
+        }
     }
-    
-    function insert($adresse){
-        $sql = "INSERT INTO...";
+
+    public function insert($adresse) {
+        $params = "rue";
+        $values = "'" . pg_escape_string($adresse->getRue()) . "'";
+
+        $numero = $adresse->getNumero();
+        $codepostal = $adresse->getCodePostal();
+        $localite = pg_escape_string($adresse->getLocalite());
+        if (isset($numero)) {
+            $params.=",numero";
+            $values.=",'" . $numero . "'";
+        }
+        if (isset($codepostal)) {
+            $params.=",codepostal";
+            $values.=",'" . $codepostal . "'";
+        }
+        if (isset($localite)) {
+            $params.=",localite";
+            $values.=",'" . $localite . "'";
+        }
+
+        $query = "INSERT INTO adresse (" . $params . ") VALUES (" . $values . ") RETURNING idadresse";
+        //$this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        echo $query;
+        $queryprepared = $this->db->prepare($query);
+        $queryprepared->execute();
+
+
+        $result = $queryprepared->fetch(PDO::FETCH_ASSOC);
+        echo "ID DE L'ADRESSE: ".$result["idadresse"];
+        return $result["idadresse"];
     }
-    
-    function modify($adresse){
+
+    public function modify($adresse) {
         $sql = "UPDATE...";
     }
-    
-    function getByParams($params){
-        
+
+    public function getByParams($params) {
+
         $query = "SELECT * FROM adresse";
-        
-        if(!empty($params)){
+
+        if (!empty($params)) {
             $query.=" WHERE ";
-            foreach($params as $key=>$param){
-                $query.=$key." = '".pg_escape_string($param)."' AND ";
+            foreach ($params as $key => $param) {
+                $query.=$key . " = '" . pg_escape_string($param) . "' AND ";
             }
             $query = substr($query, 0, -5);
         }
-        
+        //echo $query;
         $result = $this->db->query($query);
-        $object = $result->fetch(PDO::FETCH_OBJ);
+        if (!empty($result)) {
+            $adresses = array();
+            while ($object = $result->fetch(PDO::FETCH_OBJ)) {
+                $adresse = $this->buildAdresse($object);
+                array_push($adresses, $adresse);
+            }
+            return $adresses;
+        } else {
+            return null;
+        }
+    }
+    
+    public function getByIdEleve($id){
+        $query = "SELECT * FROM adresse INNER JOIN eleve_adresse ON adresse.idAdresse = eleve_adresse.idAdresse  WHERE eleve_adresse.ideleve = ".$id;
+        $result = $this->db->query($query);
+        if (!empty($result)) {
+            $adresses = array();
+            while ($object = $result->fetch(PDO::FETCH_OBJ)) {
+                $adresse = $this->buildAdresse($object);
+                array_push($adresses, $adresse);
+            }
+            return $adresses;
+        } else {
+            echo "RETOURNE NULL";
+            return null;
+        }
         
-        if(!empty($object)){
+    }
+    
+    private function buildAdresse($object) {
             $adresse = new Model_Adresse();
             $adresse->setIdAdresse($object->idadresse);
             $adresse->setRue($object->rue);
             $adresse->setNumero($object->numero);
-            $adresse->setCodepostal($object->codepostal);
+            $adresse->setCodePostal($object->codepostal);
             $adresse->setLocalite($object->localite);
             $adresse->setEmplacement($object->emplacement);
-            return $adresse;
-        }else{
-            return null;
-        }
+
+        return $adresse;
     }
+
 }
+
 ?>

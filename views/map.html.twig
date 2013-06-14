@@ -8,6 +8,10 @@
 {% endblock %}
 {% block title %}Map{% endblock %}
 {% block content %}
-<input type="text" id="filter" />
+{% if filter == false %}
+    <input type="text" id="filter" value="" />
+    {% else %}
+    <input type="text" id="filter" value="{{filter['filter']|convert_encoding('ISO-8859-1','UTF-8') }}" />
+{% endif %}
 <div id="map"></div>
 {% endblock %}
