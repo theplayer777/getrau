@@ -2,6 +2,9 @@
 
 {% block title %}Index{% endblock %}
 {% block head %}
+<script type="text/javascript" src="js/jquery/jquery-1.9.1.js"></script>
+<script type="text/javascript" src="js/errors.js"></script>
+
 {% endblock %}
 {% block content %}
 <script>
@@ -17,15 +20,40 @@ function init() {
     }
 }
 
-</script>
+    </script>
 
 </head>
 
 <body onload="init()">
 
-    <form action="/getrau/" method="post" enctype="multipart/form-data">
-        Normal Text: <input type="text" name="name">
-        <span id="multipleFileLabel" style="display:none">Multiple </span>File: <input type="file" name="files" multiple="multiple">
-        <input type="submit">
+    <form id="formImport" action="/getrau/executeImport" method="post" enctype="multipart/form-data">
+        <span id="multipleFileLabel" style="display:none">Multiple </span>File: <input type="file" name="file[]" multiple="multiple">
+        <input type="submit" id="importButton" disabled="true" value="Importer">
     </form>
+
+    <script>
+$(document).ready(function() {
+    $(':INPUT[type="file"]').change(function () {
+        console.log(this.files);
+        for(var i= 0; i<this.files.length; i++){
+            console.log(this.files[i].name);
+            var ext = this.files[i].name.match(/\.(.+)$/)[1];
+            console.log(ext);
+            switch (ext) {
+                case 'xls':
+                case 'xlsx':
+                $('#importButton').attr('disabled', false);
+                break;
+            default:
+                $('body').find('form')[0].reset();
+                showMessagePerso('error','Une erreur est survenue','Le fichier doit être de type Excel (.xls, .xlsx)');
+            }
+        }
+    });
+});
+
+
+        </script>
+
+
 {% endblock %}

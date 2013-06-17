@@ -6,6 +6,7 @@
         @import "js/datatables/css/demo_table.css";
     </style>
     <script type="text/javascript" src="js/jquery/jquery-1.9.1.js"></script>
+    <script type="text/javascript" src="js/errors.js"></script>
     <script type="text/javascript" language="javascript" src="js/datatables/js/jquery.dataTables.js"></script>
     <script type="text/javascript" charset="utf-8">
                             $(document).ready(function() {
@@ -49,10 +50,15 @@
                         <td>{{ eleve.adresses[0].numero }}</td>
                         <td>{{ eleve.adresses[0].localite }}</td>
                         <td>{{ eleve.classes[0].nom }}</td>
-                        <td><a href="/getrau/map?filter={{ eleve.prenom }} {{ eleve.nom }}">Afficher</a></td>
+                        <td><a href="/getrau/map?filter={{ eleve.prenom }} {{ eleve.nom }}&x={{eleve.adresses[0].x}}&y={{eleve.adresses[0].y}}">Afficher</a></td>
                     </tr>
 {% endfor %}
                 </tbody>
                 </table>
+Type:{{msgType}}
+{% if msgType is defined %}
+
+<script>showMessagePerso("{{msgType}}","{{msgTitle}}","{{msgText}}")</script>
+{% endif %}
 
 {% endblock %}

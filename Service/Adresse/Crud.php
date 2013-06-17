@@ -5,12 +5,12 @@ class Service_Adresse_Crud {
     private $db;
 
     function __construct() {
-        $this->db = Application::getInstance()->db;
+        $this->db = Application::getInstance()->getDB();
     }
 
     public function getById($id) {
 
-        $query = "SELECT * FROM adresse WHERE idadresse = " . $id;
+        $query = "SELECT *,ST_AsGeoJSON(adresse.emplacement) as xy FROM adresse WHERE idadresse = " . $id;
         $result = $this->db->query($query);
         if (!empty($result)) {
             $object = $result->fetch(PDO::FETCH_OBJ);
@@ -43,13 +43,13 @@ class Service_Adresse_Crud {
 
         $query = "INSERT INTO adresse (" . $params . ") VALUES (" . $values . ") RETURNING idadresse";
         //$this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        echo $query;
+        //echo $query;
         $queryprepared = $this->db->prepare($query);
         $queryprepared->execute();
 
 
         $result = $queryprepared->fetch(PDO::FETCH_ASSOC);
-        echo "ID DE L'ADRESSE: ".$result["idadresse"];
+        //echo "ID DE L'ADRESSE: ".$result["idadresse"];
         return $result["idadresse"];
     }
 
@@ -59,7 +59,7 @@ class Service_Adresse_Crud {
 
     public function getByParams($params) {
 
-        $query = "SELECT * FROM adresse";
+        $query = "SELECT *,ST_AsGeoJSON(adresse.emplacement) as xy FROM adresse";
 
         if (!empty($params)) {
             $query.=" WHERE ";
@@ -83,7 +83,7 @@ class Service_Adresse_Crud {
     }
     
     public function getByIdEleve($id){
-        $query = "SELECT * FROM adresse INNER JOIN eleve_adresse ON adresse.idAdresse = eleve_adresse.idAdresse  WHERE eleve_adresse.ideleve = ".$id;
+        $query = "SELECT *,ST_AsGeoJSON(adresse.emplacement) as xy FROM adresse INNER JOIN eleve_adresse ON adresse.idAdresse = eleve_adresse.idAdresse  WHERE eleve_adresse.ideleve = ".$id;
         $result = $this->db->query($query);
         if (!empty($result)) {
             $adresses = array();
@@ -93,7 +93,7 @@ class Service_Adresse_Crud {
             }
             return $adresses;
         } else {
-            echo "RETOURNE NULL";
+            //echo "RETOURNE NULL";
             return null;
         }
         
@@ -106,7 +106,9 @@ class Service_Adresse_Crud {
             $adresse->setNumero($object->numero);
             $adresse->setCodePostal($object->codepostal);
             $adresse->setLocalite($object->localite);
-            $adresse->setEmplacement($object->emplacement);
+            $adresse->setX($object->x);
+            $adresse->setY($object->y);
+           // print_r($object);
 
         return $adresse;
     }

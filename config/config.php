@@ -6,4 +6,6 @@ define("DB_NAME", "getrau");
 define("DB_USER", "postgres");
 define("DB_PASSWD", "postgres");
 
+define("ERROR_FILE", "log.txt");
+
 ?>

@@ -5,7 +5,7 @@ class Service_Classe_Crud {
     private $db;
 
     public function __construct() {
-        $this->db = Application::getInstance()->db;
+        $this->db = Application::getInstance()->getDB();
     }
 
     public function getAll() {
@@ -47,7 +47,7 @@ class Service_Classe_Crud {
             $values.=",'" . $professeur . "'";
         }
         $query = "INSERT INTO classe (" . $params . ") VALUES (" . $values . ") RETURNING idclasse";
-        echo $query;
+        //echo $query;
         $queryprepared = $this->db->prepare($query);
         $queryprepared->execute();
 
@@ -75,7 +75,7 @@ class Service_Classe_Crud {
                 $query.=$key . " = '" . pg_escape_string($param) . "' AND ";
             }
             $query = substr($query, 0, -5);
-            echo $query;
+            //echo $query;
         }
 
         $result = $this->db->query($query);
@@ -103,7 +103,7 @@ class Service_Classe_Crud {
             }
             return $classes;
         } else {
-            echo "RETURN NULL";
+            //echo "RETURN NULL";
             return null;
         }
     }

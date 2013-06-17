@@ -5,7 +5,7 @@ class Service_Arret_Crud {
     private $db;
     
     function __construct() {
-        $this->db = Application::getInstance()->db;
+        $this->db = Application::getInstance()->getDB();
     }
 
     function getById($id) {

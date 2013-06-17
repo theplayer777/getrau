@@ -26,9 +26,9 @@ class Service_Eleve_Fonctionnel {
         $eleve->setAdresses($adresses);
         $eleve->setClasses($classes);
         //return $eleve;
-        echo"<pre>";
+        /*echo"<pre>";
         print_r($eleve);
-        echo"<pre>";
+        echo"<pre>";*/
     }
 
     function persist($eleve) {
@@ -37,10 +37,10 @@ class Service_Eleve_Fonctionnel {
         $serviceCrudEleveClasse = new Service_EleveClasse_Crud();
         if (!$eleve->getIdEleve()) {
             $idEleve = $serviceCrud->insert($eleve);
-            echo "ID DE L'ELEVE: ".$idEleve;
+            //echo "ID DE L'ELEVE: ".$idEleve;
         } else {
             $idEleve = $serviceCrud->modify($eleve);
-            echo "ID DE L'ELEVE: ".$idEleve;
+            //echo "ID DE L'ELEVE: ".$idEleve;
         }
         foreach ($eleve->getAdresses() as $adresse) {
             $serviceCrudEleveAdresse->persist($idEleve, $adresse->getIdAdresse());
@@ -49,7 +49,7 @@ class Service_Eleve_Fonctionnel {
         if (!empty($classes)) {
             foreach ($classes as $classe) {
                 $serviceCrudEleveClasse->persist($idEleve, $classe->getIdClasse());
-                echo "ID DE LA CLASSE: " . $classe->getIdClasse();
+                //echo "ID DE LA CLASSE: " . $classe->getIdClasse();
             }
         }
     }

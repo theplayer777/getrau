@@ -8,6 +8,8 @@ class Model_Adresse implements JsonSerializable {
     private $codePostal;
     private $localite;
     private $emplacement;
+    private $x;
+    private $y;
 
     public function __construct() {
         
@@ -68,9 +70,22 @@ class Model_Adresse implements JsonSerializable {
     public function getEmplacement(){
         return $this->emplacement;
     }
+    
+    public function getX(){
+        return $this->x;
+    }
+    public function setX($x){
+        $this->x = $x;
+    }
+    public function getY(){
+        return $this->y;
+    }
+    public function setY($y){
+        $this->y = $y;
+    }
 
     public function jsonSerialize() {
-        $adresse = array('rue' => $this->rue, "numero" => $this->numero, "localite" => $this->localite );
+        $adresse = array('rue' => $this->rue, "numero" => $this->numero, "localite" => $this->localite, "x" => $this->x, "y" => $this->y );
         return $adresse;
     }
 

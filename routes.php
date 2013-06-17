@@ -32,5 +32,9 @@ $array = [
         "controller" => "View",
         "action" => "import",
     ],
+    "/executeImport" => [
+        "controller" => "View",
+        "action" => "executeImport",
+    ],
 ];
 ?>

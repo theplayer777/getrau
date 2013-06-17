@@ -5,12 +5,14 @@ header('Content-Type: text/html; charset=utf-8');
 class Controller_SetData {
 
     private $twig;
+    private $errors;
 
     public function __construct() {
         $loader = new Twig_Loader_Filesystem('views');
         $this->twig = new Twig_Environment($loader, array(
                     'cache' => false
                 ));
+        $this->errors = $this->db = Application::getInstance()->getErrors();
     }
 
     public function insertEleve() {
@@ -64,7 +66,7 @@ class Controller_SetData {
         $colNames['dateNaissance'] = "DateNaissance";
 
         $files = array_slice(array_filter(glob('data/*'), 'is_file'), 0);
-        print_r($files);
+        //print_r($files);
         $serviceManager = new Service_Manager();
 
 
@@ -88,8 +90,12 @@ class Controller_SetData {
                 }
             }
 
-            $assocArray = $this->createAssocArray($colRows, $objPHPExcel, $assocArray);
-
+            //Si le fichier contient au moins l'id, le nom et le prénom de l'élève
+            if (!empty($colRows['idEleve']) && !empty($colRows['nomEleve']) && !empty($colRows['prenomEleve'])) {
+                $assocArray = $this->createAssocArray($colRows, $objPHPExcel, $assocArray);
+            } else {
+                $this->errors->addError("le fichier \"" . $file . "\" ne contient pas les colonnes requises");
+            }
             for ($i = 2; $i <= $highestRow; $i++) {
 
                 //On test si l'élève n'a pas déjà été créé lors d'un parcours precedent de la boucle
@@ -108,9 +114,9 @@ class Controller_SetData {
             }
         }
 
-        echo "<pre>";
-        print_r($assocArray);
-        echo "</pre>";
+        /* echo "<pre>";
+          print_r($assocArray);
+          echo "</pre>"; */
 
         //------------------------ DEUXIEME ETAPE ------------------------------//
         //Nous avons maintenant tous les élèves avec leurs données principales: id,nom et prenom
@@ -218,62 +224,68 @@ class Controller_SetData {
                 $eleve = new Model_Eleve();
 
                 // LA LIGNE SUIVANTE NE DOIT ETRE POSSIBLE QU'ICI!!!
-                $eleve->setDateNaissance($tabEleve['dateNaissance']);
+                if (!empty($tabEleve['dateNaissance'])) {
+                    $eleve->setDateNaissance($tabEleve['dateNaissance']);
+                }
                 $eleve->setNom($tabEleve['nomEleve']);
                 $eleve->setNumeroScolaire($numeroEleve);
                 $eleve->setPrenom($tabEleve['prenomEleve']);
-                $eleve->setSexe($tabEleve['sexe']);
+                if (!empty($tabEleve['sexe'])) {
+                    $eleve->setSexe($tabEleve['sexe']);
+                }
                 //$eleve->setStatuscourant($tabEleve['nomEleve']);
                 //$eleve->setStatussuivant($tabEleve['nomEleve']);
-                $paramsAdresse = array("rue" => $tabEleve['rue'], "codepostal" => $tabEleve['npa'], "localite" => $tabEleve['localite']);
-                if (!empty($tabEleve['numero'])) {
-                    $paramsAdresse['numero'] = $tabEleve['numero'];
-                } else {
-                    $paramsAdresse['numero'] = null;
-                }
-                $adresses = $serviceManager->getByParams('Adresse', $paramsAdresse);
-
-                //Si l'adresse n'existe pas, on l'ajoute dans la BD
-                if (empty($adresses)) {
-                    $adresse = new Model_Adresse();
-                    $adresse->setRue($tabEleve['rue']);
+                if (!empty($tabEleve['rue']) && !empty($tabEleve['npa']) && !empty($tabEleve['localite'])) {
+                    $paramsAdresse = array("rue" => $tabEleve['rue'], "codepostal" => $tabEleve['npa'], "localite" => $tabEleve['localite']);
                     if (!empty($tabEleve['numero'])) {
-                        $adresse->setNumero($tabEleve['numero']);
+                        $paramsAdresse['numero'] = $tabEleve['numero'];
                     } else {
-                        $adresse->setNumero(null);
+                        $paramsAdresse['numero'] = null;
                     }
-                    $adresse->setCodePostal($tabEleve['npa']);
-                    $adresse->setLocalite($tabEleve['localite']);
-                    $idAdresse = $serviceManager->persist($adresse);
-                    $adresses = array($serviceManager->getById('Adresse', $idAdresse));
+                    $adresses = $serviceManager->getByParams('Adresse', $paramsAdresse);
 
-                    /* return $eleve;
-                      echo $numeroEleve;
-                      echo $tabEleve['nomEleve']; */
-                }
-                $eleve->setAdresses($adresses);
+                    //Si l'adresse n'existe pas, on l'ajoute dans la BD
+                    if (empty($adresses)) {
+                        $adresse = new Model_Adresse();
+                        $adresse->setRue($tabEleve['rue']);
+                        if (!empty($tabEleve['numero'])) {
+                            $adresse->setNumero($tabEleve['numero']);
+                        } else {
+                            $adresse->setNumero(null);
+                        }
+                        $adresse->setCodePostal($tabEleve['npa']);
+                        $adresse->setLocalite($tabEleve['localite']);
+                        $idAdresse = $serviceManager->persist($adresse);
+                        $adresses = array($serviceManager->getById('Adresse', $idAdresse));
 
-                $paramsClasse = array("nom" => $tabEleve['classe'], "numeroetablissement" => $tabEleve['etablissement']);
-                if (!empty($tabEleve['cycle'])) {
-                    $paramsClasse['cycle'] = $tabEleve['cycle'];
+                        /* return $eleve;
+                          echo $numeroEleve;
+                          echo $tabEleve['nomEleve']; */
+                    }
+                    $eleve->setAdresses($adresses);
                 }
-                $classes = $serviceManager->getByParams('Classe', $paramsClasse);
-                //Si la classe n'existe pas dans la bd, on l'enregistre
-                if (empty($classes)) {
-                    $classe = new Model_Classe();
-                    $classe->setNom($tabEleve['classe']);
-                    $classe->setNumeroEtablissement($tabEleve['etablissement']);
+                if (!empty($tabEleve['classe']) && !empty($tabEleve['etablissement'])) {
+                    $paramsClasse = array("nom" => $tabEleve['classe'], "numeroetablissement" => $tabEleve['etablissement']);
                     if (!empty($tabEleve['cycle'])) {
-                        $classe->setCycle($tabEleve['cycle']);
+                        $paramsClasse['cycle'] = $tabEleve['cycle'];
                     }
-                    if (!empty($tabEleve['professeur'])) {
-                        $classe->setProfesseur($tabEleve['professeur']);
+                    $classes = $serviceManager->getByParams('Classe', $paramsClasse);
+                    //Si la classe n'existe pas dans la bd, on l'enregistre
+                    if (empty($classes)) {
+                        $classe = new Model_Classe();
+                        $classe->setNom($tabEleve['classe']);
+                        $classe->setNumeroEtablissement($tabEleve['etablissement']);
+                        if (!empty($tabEleve['cycle'])) {
+                            $classe->setCycle($tabEleve['cycle']);
+                        }
+                        if (!empty($tabEleve['professeur'])) {
+                            $classe->setProfesseur($tabEleve['professeur']);
+                        }
+                        $idClasse = $serviceManager->persist($classe);
+                        $classes = array($serviceManager->getById('Classe', $idClasse));
                     }
-                    $idClasse = $serviceManager->persist($classe);
-                    $classes = array($serviceManager->getById('Classe', $idClasse));
+                    $eleve->setClasses($classes);
                 }
-                $eleve->setClasses($classes);
-
                 $serviceManager->persist($eleve);
             }
         }
@@ -283,7 +295,7 @@ class Controller_SetData {
         $highestRow = $objPHPExcel->getActiveSheet()->getHighestRow();
         $highestCol = PHPExcel_Cell::columnIndexFromString($objPHPExcel->getActiveSheet()->getHighestColumn());
         $i = 2;
-        echo "highestRow: " . $highestRow;
+        //echo "highestRow: " . $highestRow;
         for ($i = 2; $i <= $highestRow; $i++) {
             if (empty($valueTables[$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['idEleve'], $i)->getValue()]['nomEleve'])) {
                 $valueTables[$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['idEleve'], $i)->getValue()]['nomEleve'] = $objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['nomEleve'], $i)->getValue();
@@ -321,6 +333,7 @@ class Controller_SetData {
                 $valueTables[$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['idEleve'], $i)->getValue()]['professeur'] = $objPHPExcel->getActiveSheet()->getCellByColumnAndRow($colRows['professeur'], $i)->getValue();
             }
         }
+
         return $valueTables;
     }
 

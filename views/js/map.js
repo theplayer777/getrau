@@ -1,4 +1,4 @@
-var arrets, refresh, filter_arrets_nom;
+var arrets, refresh, filter_arrets_nom, map;
 $(document).ready(function() {
 
     map = new OpenLayers.Map('map');
@@ -30,7 +30,7 @@ $(document).ready(function() {
 
     var styleLignes = new OpenLayers.Style({
         strokeWidth: 5,
-        strokeColor: "#00ff00"
+        strokeColor: "#ff0000"
     });
     
     var styleEleves = new OpenLayers.Style({
@@ -119,6 +119,7 @@ $(document).ready(function() {
         refreshArrets.refresh();
         refreshLignes.refresh();
         refreshEleves.refresh();
+        console.log("hello world");
     });
 
     // activation du contrôle de sélection "hover" sur la couche arrets
@@ -203,4 +204,21 @@ $(window).load(function () {
         refreshArrets.refresh();
         refreshLignes.refresh();
         refreshEleves.refresh();
+        var params = getQueryParams(document.location.search);
+        console.log(params.x);
+        map.setCenter(new OpenLayers.LonLat(params.x, params.y), 8);
 });
+
+function getQueryParams(qs) {
+    qs = qs.split("+").join(" ");
+
+    var params = {}, tokens,
+        re = /[?&]?([^=]+)=([^&]*)/g;
+
+    while (tokens = re.exec(qs)) {
+        params[decodeURIComponent(tokens[1])]
+            = decodeURIComponent(tokens[2]);
+    }
+
+    return params;
+}

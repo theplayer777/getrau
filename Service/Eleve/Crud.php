@@ -5,7 +5,7 @@ class Service_Eleve_Crud {
     private $db;
 
     function __construct() {
-        $this->db = Application::getInstance()->db;
+        $this->db = Application::getInstance()->getDB();
     }
 
     public function getAll() {
@@ -25,7 +25,7 @@ class Service_Eleve_Crud {
 
     public function getById($id) {
         $sql = "SELECT * FROM eleve WHERE ideleve = " . $id['id'];
-        echo $sql;
+        //echo $sql;
         $result = $this->db->query($sql);
         $object = $result->fetch(PDO::FETCH_OBJ);
 
@@ -70,7 +70,7 @@ class Service_Eleve_Crud {
         //$this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $queryprepared = $this->db->prepare($query);
         $queryprepared->execute();
-        echo $query;
+        //echo $query;
 
         $result = $queryprepared->fetch(PDO::FETCH_ASSOC);
         return $result["ideleve"];
