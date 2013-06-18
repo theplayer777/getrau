@@ -1,0 +1,73 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Horaires de bus{% endblock %}
+{% block content %}
+<table border = 1>
+    <tr>
+        <td>arret 1</td>
+        <td>arret 2</td>
+        <td>arret 3</td>
+        <td>arret 4</td>
+        <td>arret 5</td>
+        <td rowspan=2>
+            <table border=1>
+                <tr>
+                    <td>Tous les jours</td>
+                    <td>Lundi</td>
+                    <td>Mardi</td>
+                    <td>Mercredi</td>
+                    <td>Jeudi</td>
+                    <td>Vendredi</td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox"/></td>
+                    <td><input type="checkbox"/></td>
+                    <td><input type="checkbox"/></td>
+                    <td><input type="checkbox"/></td>
+                    <td><input type="checkbox"/></td>
+                    <td><input type="checkbox"/></td>
+                </tr>
+                <tr>
+                    <td><select name="all">
+                            {% for vehicule in vehicules %}
+                                    <option value="{{vehicule.numero}}">{{vehicule.numero}}</option>    
+                            {% endfor %}
+                        </select></td>
+                    <td><select>
+                            {% for vehicule in vehicules %}
+                                    <option value="{{vehicule.numero}}">{{vehicule.numero}}</option>    
+                            {% endfor %}
+                        </select></td>
+                    <td><select>
+                            {% for vehicule in vehicules %}
+                                    <option value="{{vehicule.numero}}">{{vehicule.numero}}</option>    
+                            {% endfor %}
+                        </select></td>
+                    <td><select>
+                            {% for vehicule in vehicules %}
+                                    <option value="{{vehicule.numero}}">{{vehicule.numero}}</option>    
+                            {% endfor %}
+                        </select></td>
+                    <td><select>
+                            {% for vehicule in vehicules %}
+                                    <option value="{{vehicule.numero}}">{{vehicule.numero}}</option>    
+                            {% endfor %}
+                        </select></td>
+                    <td><select>
+                            {% for vehicule in vehicules %}
+                                    <option value="{{vehicule.numero}}">{{vehicule.numero}}</option>    
+                            {% endfor %}
+                        </select></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td><input type="text"size=2 maxlength="2"><input type="text"size=2 maxlength="2"></td>
+        <td><input type="text"size=2 maxlength="2"><input type="text"size=2 maxlength="2"></td>
+        <td><input type="text"size=2 maxlength="2"><input type="text"size=2 maxlength="2"></td>
+        <td><input type="text"size=2 maxlength="2"><input type="text"size=2 maxlength="2"></td>
+        <td><input type="text"size=2 maxlength="2"><input type="text"size=2 maxlength="2"></td>
+    </tr>
+</table>
+{% endblock %}

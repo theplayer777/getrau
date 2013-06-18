@@ -1,17 +1,13 @@
 <?php
 
-class Model_Ligne
+class Model_Ligne implements JsonSerializable
 {
 
     private $idLigne;
 
     private $region;
-
-    private $numero;
     
     private $couleur;
-
-    private $routesBus;
     
     private $idArrets;
 
@@ -19,7 +15,10 @@ class Model_Ligne
 
     }
 
-
+    public function setIdLigne($idLigne){
+        $this->idLigne = $idLigne;
+    }
+    
     public function getIdLigne(){
         return $this->idLigne;
     }
@@ -31,35 +30,6 @@ class Model_Ligne
 
     public function getRegion(){
         return $this->region;
-    }
-
-    public function setNumero($numero){
-        $this->numero[] = $numero;
-
-        return $this;
-    }
-
-    public function removeNumero($numero){
-        $this->numero->removeElement($numero);
-    }
-
-    public function getNumero(){
-        return $this->numero;
-    }
-
-    public function addRouteBus($routeBus){
-        $this->routesBus[] = $routeBus;
-
-        return $this;
-    }
-
-    public function removeRouteBus($routeBus){
-        unset($this->routesBus->$routeBus);
-    }
-
-    public function getRoutesbus()
-    {
-        return $this->routesBus;
     }
     
     public function getIdArrets() {
@@ -76,6 +46,11 @@ class Model_Ligne
 
     public function setCouleur($couleur) {
         $this->couleur = $couleur;
+    }
+
+    public function jsonSerialize() {
+        $ligne = array('id' => $this->idLigne, 'region' => $this->region, 'arrets' => array($this->idArrets));
+        return $ligne;
     }
 
 

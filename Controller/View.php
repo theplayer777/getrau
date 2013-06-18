@@ -81,6 +81,12 @@ class Controller_View {
             echo $this->twig->render('eleves.html.twig', array('eleves' => $eleves, 'msgType' => 'success','msgTitle' => "L'opération s'est bien déroulée", 'msgText' => "Les élèves ont étés importés avec succès"));
         }
     }
+    
+    public function getHorairesBus(){
+        $controllerGetData = new Controller_GetData();
+        $vehicules = $controllerGetData->getVehicules(1);
+        echo $this->twig->render('horairesBus.html.twig',array('vehicules' => $vehicules));
+    }
 
 }
 
