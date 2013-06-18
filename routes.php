@@ -24,14 +24,6 @@ $array = [
         "controller" => "GetData",
         "action" => "getEleves",
     ],
-    "/api/getVehicules" => [
-        "controller" => "GetData",
-        "action" => "getVehicules",
-    ],
-    "/api/getLignes" => [
-        "controller" => "GetData",
-        "action" => "getLignes",
-    ],
     "/getElevesGeoJSON" => [
         "controller" => "GetData",
         "action" => "getElevesGeoJSON",
@@ -43,10 +35,6 @@ $array = [
     "/executeImport" => [
         "controller" => "View",
         "action" => "executeImport",
-    ],
-    "/getHorairesBus" => [
-        "controller" => "View",
-        "action" => "getHorairesBus",
     ],
 ];
 ?>

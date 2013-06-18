@@ -92,7 +92,7 @@ $(document).ready(function() {
     //Création du layer des élèves
     eleves = new OpenLayers.Layer.Vector("Elèves", {
         styleMap: styleEleves,
-        strategies: [new OpenLayers.Strategy.Fixed(),refreshEleves],
+        strategies: [new OpenLayers.Strategy.Fixed(), refreshEleves],
         protocol: new OpenLayers.Protocol.HTTP({
             url: "../getElevesGeoJSON",
             params: {
