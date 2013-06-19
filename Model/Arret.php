@@ -1,6 +1,6 @@
 <?php
 
-class Model_Arret
+class Model_Arret implements JsonSerializable
 {
 
     private $idarret;
@@ -51,6 +51,11 @@ class Model_Arret
 
     public function setEmplacement($emplacement) {
         $this->emplacement = $emplacement;
+    }
+
+    public function jsonSerialize() {
+        $arret = array('id' => $this->idarret, 'nom' => $this->nom, 'localite' => $this->localite);
+        return $arret;
     }
 
 

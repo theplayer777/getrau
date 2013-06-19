@@ -1,214 +1,58 @@
 <?php
 
-namespace Jne\GetrauBundle\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
-
-/**
- * Horairecourse
- *
- * @ORM\Table(name="horairecourse")
- * @ORM\Entity
- */
-class Horairecourse
+class Model_HoraireCourse
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="idhorairecourse", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="SEQUENCE")
-     * @ORM\SequenceGenerator(sequenceName="horairecourse_idhorairecourse_seq", allocationSize=1, initialValue=1)
-     */
-    private $idhorairecourse;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="heurearrivee", type="time", nullable=true)
-     */
-    private $heurearrivee;
-
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="heuredepart", type="time", nullable=true)
-     */
-    private $heuredepart;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="type", type="string", length=45, nullable=true)
-     */
+    private $idHoraireCourse;
+    private $heure;
     private $type;
+    private $idArret;
+    private $idCourse;
 
-    /**
-     * @var \Doctrine\Common\Collections\Collection
-     *
-     * @ORM\ManyToMany(targetEntity="Course", mappedBy="idhorairecourse")
-     */
-    private $numero;
 
-    /**
-     * @var \Doctrine\Common\Collections\Collection
-     *
-     * @ORM\ManyToMany(targetEntity="Jour", mappedBy="idhorairecourse")
-     */
-    private $nom;
-
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->numero = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->nom = new \Doctrine\Common\Collections\ArrayCollection();
+    public function __construct(){
+    }
+    
+    public function getIdhorairecourse() {
+        return $this->idHoraireCourse;
     }
 
-
-    /**
-     * Get idhorairecourse
-     *
-     * @return integer 
-     */
-    public function getIdhorairecourse()
-    {
-        return $this->idhorairecourse;
+    public function setIdhorairecourse($idhorairecourse) {
+        $this->idHoraireCourse = $idhorairecourse;
     }
 
-    /**
-     * Set heurearrivee
-     *
-     * @param \DateTime $heurearrivee
-     * @return Horairecourse
-     */
-    public function setHeurearrivee($heurearrivee)
-    {
-        $this->heurearrivee = $heurearrivee;
-
-        return $this;
+    public function getHeure() {
+        return $this->heure;
     }
 
-    /**
-     * Get heurearrivee
-     *
-     * @return \DateTime 
-     */
-    public function getHeurearrivee()
-    {
-        return $this->heurearrivee;
+    public function setHeure($heure) {
+        $this->heure = $heure;
     }
 
-    /**
-     * Set heuredepart
-     *
-     * @param \DateTime $heuredepart
-     * @return Horairecourse
-     */
-    public function setHeuredepart($heuredepart)
-    {
-        $this->heuredepart = $heuredepart;
-
-        return $this;
-    }
-
-    /**
-     * Get heuredepart
-     *
-     * @return \DateTime 
-     */
-    public function getHeuredepart()
-    {
-        return $this->heuredepart;
-    }
-
-    /**
-     * Set type
-     *
-     * @param string $type
-     * @return Horairecourse
-     */
-    public function setType($type)
-    {
-        $this->type = $type;
-
-        return $this;
-    }
-
-    /**
-     * Get type
-     *
-     * @return string 
-     */
-    public function getType()
-    {
+    public function getType() {
         return $this->type;
     }
 
-    /**
-     * Add numero
-     *
-     * @param \Jne\GetrauBundle\Entity\Course $numero
-     * @return Horairecourse
-     */
-    public function addNumero(\Jne\GetrauBundle\Entity\Course $numero)
-    {
-        $this->numero[] = $numero;
-
-        return $this;
+    public function setType($type) {
+        $this->type = $type;
     }
 
-    /**
-     * Remove numero
-     *
-     * @param \Jne\GetrauBundle\Entity\Course $numero
-     */
-    public function removeNumero(\Jne\GetrauBundle\Entity\Course $numero)
-    {
-        $this->numero->removeElement($numero);
+    public function getIdArret() {
+        return $this->idArret;
     }
 
-    /**
-     * Get numero
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getNumero()
-    {
-        return $this->numero;
+    public function setIdArret($idArret) {
+        $this->idArret = $idArret;
     }
 
-    /**
-     * Add nom
-     *
-     * @param \Jne\GetrauBundle\Entity\Jour $nom
-     * @return Horairecourse
-     */
-    public function addNom(\Jne\GetrauBundle\Entity\Jour $nom)
-    {
-        $this->nom[] = $nom;
-
-        return $this;
+    public function getIdCourse() {
+        return $this->idCourse;
     }
 
-    /**
-     * Remove nom
-     *
-     * @param \Jne\GetrauBundle\Entity\Jour $nom
-     */
-    public function removeNom(\Jne\GetrauBundle\Entity\Jour $nom)
-    {
-        $this->nom->removeElement($nom);
-    }
-
-    /**
-     * Get nom
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getNom()
-    {
-        return $this->nom;
+    public function setIdCourse($idCourse) {
+        $this->idCourse = $idCourse;
     }
 }
+
+?>

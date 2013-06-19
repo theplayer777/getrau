@@ -1,25 +1,24 @@
 <?php
 
-class Model_Ligne
+class Model_Ligne implements JsonSerializable
 {
 
     private $idLigne;
 
     private $region;
-
-    private $numero;
     
     private $couleur;
-
-    private $routesBus;
     
-    private $idArrets;
+    private $arrets;
 
     public function __construct(){
 
     }
 
-
+    public function setIdLigne($idLigne){
+        $this->idLigne = $idLigne;
+    }
+    
     public function getIdLigne(){
         return $this->idLigne;
     }
@@ -32,42 +31,13 @@ class Model_Ligne
     public function getRegion(){
         return $this->region;
     }
-
-    public function setNumero($numero){
-        $this->numero[] = $numero;
-
-        return $this;
-    }
-
-    public function removeNumero($numero){
-        $this->numero->removeElement($numero);
-    }
-
-    public function getNumero(){
-        return $this->numero;
-    }
-
-    public function addRouteBus($routeBus){
-        $this->routesBus[] = $routeBus;
-
-        return $this;
-    }
-
-    public function removeRouteBus($routeBus){
-        unset($this->routesBus->$routeBus);
-    }
-
-    public function getRoutesbus()
-    {
-        return $this->routesBus;
-    }
     
-    public function getIdArrets() {
-        return $this->idArrets;
+    public function getArrets() {
+        return $this->arrets;
     }
 
-    public function addIdArret($idArret) {
-        $this->idArrets[] = $idArret;
+    public function addArret($idArret) {
+        $this->arrets[] = $idArret;
     }
 
     public function getCouleur() {
@@ -78,5 +48,12 @@ class Model_Ligne
         $this->couleur = $couleur;
     }
 
+    public function jsonSerialize() {
+        $ligne = array('id' => $this->idLigne, 'region' => $this->region, 'arrets' => array($this->arrets));
+        return $ligne;
+    }
+
 
 }
+
+?>

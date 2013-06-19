@@ -1,5 +1,6 @@
 <?php
 header('Content-Type: text/html; charset=utf-8');
+require_once('lib/Tools.php');
 //hello world
     global $getrau;
     $getrau = Application::getInstance();
